@@ -1,0 +1,73 @@
+<h2>Layout B, refined</h2>
+<p class="subtitle">Side column widened and stretched to match the scope's height, so the meters and readouts fill the space evenly with nothing left under them. Shown at roughly the size it would open at.</p>
+
+<style>
+  .scope-wrap { background:#0d1117; border-radius:10px; padding:16px; color:#c9d1d9; font-family: ui-monospace, Menlo, monospace; font-size:12px; }
+  .scope-title { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; color:#8b949e; font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+  .pill { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center; }
+  .pill span { color:#8b949e; }
+  .pill b { color:#e6edf3; font-size:16px; }
+  .corr { position:relative; height:12px; background:linear-gradient(90deg,#f85149 0%,#d29922 35%,#3fb950 70%,#3fb950 100%); border-radius:6px; margin-top:12px; }
+  .corr i { position:absolute; top:-4px; width:3px; height:20px; background:#fff; border-radius:2px; }
+  .corr-lbl { display:flex; justify-content:space-between; color:#8b949e; margin-top:4px; }
+  .side { display:flex; flex-direction:column; justify-content:space-between; }
+  .status { border-radius:8px; padding:10px; text-align:center; font-weight:bold; letter-spacing:.06em; font-size:13px; }
+  .ok { background:#12331f; color:#3fb950; border:1px solid #238636; }
+  .hbar { height:16px; background:#161b22; border:1px solid #30363d; border-radius:4px; position:relative; }
+  .hbar span { position:absolute; left:0; top:0; bottom:0; border-radius:4px; background:linear-gradient(90deg,#3fb950 0%,#3fb950 75%,#d29922 90%,#f85149 100%); }
+  .hbar em { position:absolute; top:0; bottom:0; width:2px; background:#fff; }
+  .mlbl { display:flex; justify-content:space-between; color:#8b949e; font-size:11px; margin-bottom:3px; }
+</style>
+
+<div class="mockup" style="max-width:560px;margin:0 auto">
+  <div class="mockup-header">Preview: plugin window (about 520 x 360)</div>
+  <div class="mockup-body" style="padding:0">
+    <div class="scope-wrap">
+      <div class="scope-title"><span>Goniometer</span><span>Stereo Field</span></div>
+      <div style="display:flex;gap:16px;align-items:stretch;">
+        <svg viewBox="0 0 200 200" width="280" height="280" style="background:#000;border-radius:6px;flex:none">
+          <g stroke="#21262d" stroke-width="1">
+            <line x1="100" y1="0" x2="100" y2="200"/><line x1="0" y1="100" x2="200" y2="100"/>
+            <line x1="0" y1="0" x2="200" y2="200"/><line x1="200" y1="0" x2="0" y2="200"/>
+            <circle cx="100" cy="100" r="70" fill="none"/>
+          </g>
+          <text x="100" y="12" fill="#8b949e" font-size="9" text-anchor="middle">M</text>
+          <text x="8" y="104" fill="#8b949e" font-size="9">L</text>
+          <text x="186" y="104" fill="#8b949e" font-size="9">R</text>
+          <text x="100" y="195" fill="#8b949e" font-size="9" text-anchor="middle">S</text>
+          <ellipse cx="100" cy="100" rx="22" ry="62" fill="#3fb950" opacity=".18"/>
+          <ellipse cx="100" cy="100" rx="14" ry="50" fill="#3fb950" opacity=".3"/>
+          <ellipse cx="100" cy="100" rx="6" ry="36" fill="#7ee787" opacity=".7"/>
+        </svg>
+
+        <div class="side" style="flex:1;min-width:200px">
+          <div class="status ok">MONO OK</div>
+
+          <div>
+            <div class="mlbl"><span>L</span><span>-6.2 dB</span></div>
+            <div class="hbar"><span style="width:70%"></span><em style="left:78%"></em></div>
+            <div class="mlbl" style="margin-top:8px"><span>R</span><span>-6.8 dB</span></div>
+            <div class="hbar"><span style="width:66%"></span><em style="left:74%"></em></div>
+          </div>
+
+          <div class="pill"><span>Correlation</span><b>+0.72</b></div>
+          <div class="pill"><span>Width</span><b>38%</b></div>
+          <div class="pill"><span>Balance</span><b>L 0.4 dB</b></div>
+        </div>
+      </div>
+      <div class="corr"><i style="left:78%"></i></div>
+      <div class="corr-lbl"><span>-1</span><span>phase correlation</span><span>+1</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="options" style="margin-top:24px">
+  <div class="option" data-choice="good" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content"><h3>That's it</h3><p>Lock this layout in and move on.</p></div>
+  </div>
+  <div class="option" data-choice="tweak" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content"><h3>Close, but adjust</h3><p>Tell me what to change in the chat.</p></div>
+  </div>
+</div>

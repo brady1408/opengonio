@@ -1,0 +1,9 @@
+build/
+build-*/
+.superpowers/
+*.user
+.DS_Store
+.vs/
+.idea/
+.cache/
+compile_commands.json
