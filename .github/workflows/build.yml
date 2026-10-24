@@ -103,3 +103,66 @@ jobs:
           name: OpenGonio-${{ matrix.name }}
           path: stage/
           if-no-files-found: error
+
+      # ---- release packaging (tags only) ----
+      - name: Package (macOS)
+        if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          packaging/macos/build-pkg.sh "$V" stage/OpenGonio.vst3 stage/OpenGonio.component dist
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          choco install innosetup -y --no-progress
+          mkdir -p dist
+          "/c/Program Files (x86)/Inno Setup 6/ISCC.exe" "/DVersion=$V" "/DVst3Dir=$(cygpath -w "$PWD/stage/OpenGonio.vst3")" "/DOutDir=$(cygpath -w "$PWD/dist")" packaging/windows/opengonio.iss
+          (cd stage && 7z a "../dist/OpenGonio-$V-Windows-VST3.zip" OpenGonio.vst3)
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/v')
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          mkdir -p dist
+          cp packaging/linux/install.sh stage/
+          tar -C stage -czf "dist/OpenGonio-$V-Linux.tar.gz" .
+
+      - uses: actions/upload-artifact@v4
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: dist-${{ matrix.name }}
+          path: dist/
+          if-no-files-found: error
+
+  release:
+    name: GitHub Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: dist-*
+          merge-multiple: true
+          path: dist
+      - name: Release notes
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          {
+            echo "## OpenGonio $V"
+            echo
+            echo "Free, open-source goniometer, Lissajous / vectorscope and stereo field meter for Audacity and any VST3, AU or LV2 host."
+            echo
+            echo "**These builds are not code-signed.** macOS: right-click the .pkg and choose Open, or use System Settings → Privacy & Security → Open Anyway. Windows: SmartScreen → More info → Run anyway. Linux builds are untested by the author. Full install notes are in the [README](https://github.com/brady1408/opengonio#install)."
+          } > notes.md
+          ls -la dist
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          body_path: notes.md
+          prerelease: ${{ contains(github.ref_name, '-') }}
