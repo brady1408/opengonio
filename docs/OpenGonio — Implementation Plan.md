@@ -5,7 +5,11 @@ tags:
   - audio-plugin
   - plan
 created: '2026-10-23'
-status: written 2026-10-23; awaiting Brady's review and choice of execution method
+status: >-
+  executing 2026-10-23/24 (native): Tasks 1-13 done and pushed to
+  github.com/brady1408/opengonio (A/B session done 2026-10-24, constants in
+  docs/tuning-notes.md). Remaining: Task 14 (Windows hand test; needs SSH host
+  details), Task 15 (tag v0.1.0)
 ---
 # OpenGonio Implementation Plan
 

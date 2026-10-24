@@ -91,7 +91,7 @@ Font: a monospace UI face (the mockup used the system monospace; builder picks a
 
 **Correlation.** Standard phase correlation: Σ(L·R) / √(Σ L² · Σ R²) over a short exponentially weighted window (~300 ms, builder's call within 100–500 ms). +1 identical, 0 uncorrelated, −1 inverted.
 
-**Status light.** Driven by correlation with hysteresis so it doesn't flicker: green above +0.3, amber between −0.3 and +0.3, red below −0.3, each change requiring the new state to hold ~500 ms. `NO SIGNAL` when both channels sit below about −70 dBFS. Thresholds are my call and will be tuned with Brady on real material.
+**Status light.** Driven by correlation with hysteresis so it doesn't flicker: green above +0.1, amber between −0.2 and +0.1, red below −0.2, each change requiring the new state to hold ~500 ms (tuned 2026-10-24 from the draft's ±0.3: a wide commercial master sat at +0.15–0.4 and flickered CAUTION; see `docs/tuning-notes.md` in the repo). `NO SIGNAL` when both channels sit below about −70 dBFS. Added during build: `L ONLY` / `R ONLY` when one channel is silent and the other is not (Audacity feeds a mono track as a stereo bus with a silent right channel). Thresholds are a starting point; the README invites feedback.
 
 **L/R meters.** Sample-peak meters, −60 to 0 dBFS, fast attack, release around 20 dB/s, 1.5 s peak hold shown as a thin white tick with the held value in the readout. Clip indicator (bar turns red at the end) latches for 2 s above −0.1 dBFS.
 
