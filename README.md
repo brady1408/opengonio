@@ -2,6 +2,10 @@
 
 Free, open-source goniometer, Lissajous / vectorscope and stereo field meter for Audacity and any VST3, AU or LV2 host.
 
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-support%20the%20build-ff5e5b?logo=ko-fi&logoColor=white)](https://ko-fi.com/bradycole)
+[![build](https://github.com/brady1408/opengonio/actions/workflows/build.yml/badge.svg)](https://github.com/brady1408/opengonio/actions/workflows/build.yml)
+![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
+
 ![OpenGonio in Audacity 4](docs/screenshots/editor-0.1.0.jpg)
 
 One small window that answers the questions a stereo track raises: is it in phase, will it survive a mono fold-down, is one channel inverted or missing, and is it balanced. No account, no bundle, no newsletter, no telemetry. Install it, open your DAW, press play.
@@ -76,7 +80,7 @@ Built plugins land in `build/OpenGonio_artefacts/Release/` and are copied into y
 
 ## Support
 
-OpenGonio is free and stays free. If it saved you a bad delivery, you can [buy me a coffee on Ko-fi](https://ko-fi.com/bradycole).
+OpenGonio is free and will stay that way. If it saved you a bad delivery, you can [buy the next round on Ko-fi](https://ko-fi.com/bradycole). Issues and pull requests are just as welcome.
 
 ## License
 
