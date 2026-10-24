@@ -206,7 +206,7 @@ jobs:
             echo
             echo "Free, open-source goniometer, Lissajous / vectorscope and stereo field meter for Audacity and any VST3, AU or LV2 host."
             echo
-            echo "**These builds are not code-signed.** macOS: right-click the .pkg and choose Open, or use System Settings → Privacy & Security → Open Anyway. Windows: SmartScreen → More info → Run anyway. Linux builds are untested by the author. Full install notes are in the [README](https://github.com/brady1408/opengonio#install)."
+            echo "macOS builds are signed with a Developer ID and notarized by Apple. Windows builds are not code-signed (SmartScreen → More info → Run anyway). Linux builds are untested by the author. Every package includes LICENSE.txt and README.txt. Install notes: [README](https://github.com/brady1408/opengonio#install) · Changes: [CHANGELOG](https://github.com/brady1408/opengonio/blob/main/CHANGELOG.md)."
           } > notes.md
           ls -la dist
       - uses: softprops/action-gh-release@v2
