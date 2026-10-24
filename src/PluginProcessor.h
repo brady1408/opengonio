@@ -1,6 +1,10 @@
 #pragma once
 
+#include "dsp/SampleFifo.h"
+
 #include <juce_audio_processors/juce_audio_processors.h>
+
+#include <memory>
 
 class OpenGonioProcessor : public juce::AudioProcessor
 {
@@ -31,6 +35,23 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
+    // --- accessors used by the editor ---
+    opengonio::dsp::SampleFifo& fifo() { return *sampleFifo; }
+    double currentSampleRate() const { return sampleRate.load(); }
+    bool isMonoInput() const { return getMainBusNumInputChannels() == 1; }
+    juce::Point<int> editorSize() const;
+    void setEditorSize(juce::Point<int> size);
+
+    juce::AudioProcessorValueTreeState apvts;
+
+    static constexpr int kDefaultWidth = 520;
+    static constexpr int kDefaultHeight = 360;
+
 private:
+    static juce::AudioProcessorValueTreeState::ParameterLayout createLayout();
+
+    std::unique_ptr<opengonio::dsp::SampleFifo> sampleFifo;
+    std::atomic<double> sampleRate{48000.0};
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OpenGonioProcessor)
 };

@@ -1,6 +1,6 @@
 #include "PluginEditor.h"
 
-OpenGonioEditor::OpenGonioEditor(OpenGonioProcessor& p) : AudioProcessorEditor(p), processor(p)
+OpenGonioEditor::OpenGonioEditor(OpenGonioProcessor& p) : AudioProcessorEditor(p), proc(p)
 {
     setSize(520, 360);
 }

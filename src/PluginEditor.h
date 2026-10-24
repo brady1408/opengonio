@@ -13,7 +13,7 @@ public:
     void resized() override {}
 
 private:
-    OpenGonioProcessor& processor;
+    OpenGonioProcessor& proc;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OpenGonioEditor)
 };
