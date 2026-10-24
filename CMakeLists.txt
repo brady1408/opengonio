@@ -42,7 +42,8 @@ juce_add_plugin(OpenGonio
 
 target_sources(OpenGonio PRIVATE
     src/PluginProcessor.cpp
-    src/PluginEditor.cpp)
+    src/PluginEditor.cpp
+    src/ui/ScopeComponent.cpp)
 
 target_include_directories(OpenGonio PRIVATE src)
 
