@@ -43,7 +43,11 @@ juce_add_plugin(OpenGonio
 target_sources(OpenGonio PRIVATE
     src/PluginProcessor.cpp
     src/PluginEditor.cpp
-    src/ui/ScopeComponent.cpp)
+    src/ui/ScopeComponent.cpp
+    src/ui/LevelMeter.cpp
+    src/ui/StatusPill.cpp
+    src/ui/ReadoutPill.cpp
+    src/ui/CorrelationBar.cpp)
 
 target_include_directories(OpenGonio PRIVATE src)
 
