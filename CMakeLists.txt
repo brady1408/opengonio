@@ -62,7 +62,7 @@ target_link_libraries(OpenGonio
         juce::juce_recommended_lto_flags
         juce::juce_recommended_warning_flags)
 
-if(OPENGONIO_BUILD_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/CMakeLists.txt")
+if(OPENGONIO_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
