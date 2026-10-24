@@ -28,10 +28,24 @@ public:
     void resized() override;
     void mouseUp(const juce::MouseEvent&) override;
 
-    // Tuned in the A/B session (plan Task 11).
-    static constexpr float kDecayAlpha = 0.18f;
-    static constexpr int kHotPoints = 64;
-    static constexpr float kAutoGainReleaseSeconds = 0.5f;
+    // Tuned in the A/B session (plan Task 11). Overridable from CMake for
+    // side-by-side builds; the defaults here are the shipped values.
+#ifndef OPENGONIO_DECAY_ALPHA
+#define OPENGONIO_DECAY_ALPHA 0.18f
+#endif
+#ifndef OPENGONIO_HOT_POINTS
+#define OPENGONIO_HOT_POINTS 64
+#endif
+#ifndef OPENGONIO_LINE_WIDTH
+#define OPENGONIO_LINE_WIDTH 1.0f
+#endif
+#ifndef OPENGONIO_AUTOGAIN_RELEASE
+#define OPENGONIO_AUTOGAIN_RELEASE 0.5f
+#endif
+    static constexpr float kDecayAlpha = OPENGONIO_DECAY_ALPHA;
+    static constexpr int kHotPoints = OPENGONIO_HOT_POINTS;
+    static constexpr float kLineWidth = OPENGONIO_LINE_WIDTH;
+    static constexpr float kAutoGainReleaseSeconds = OPENGONIO_AUTOGAIN_RELEASE;
 
 private:
     juce::Rectangle<int> scopeBounds() const;

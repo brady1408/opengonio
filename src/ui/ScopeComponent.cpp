@@ -92,7 +92,7 @@ void ScopeComponent::pushFrames(const float* l, const float* r, int n)
         if (hasLastPoint)
         {
             g.setColour(i >= hotStart ? theme::greenHot : theme::green);
-            g.drawLine({lastPoint, p}, 1.0f);
+            g.drawLine({lastPoint, p}, kLineWidth);
         }
         lastPoint = p;
         hasLastPoint = true;
