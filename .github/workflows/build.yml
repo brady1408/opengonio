@@ -54,6 +54,15 @@ jobs:
             build/_deps/catch2-subbuild
           key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'tests/CMakeLists.txt') }}
 
+      - name: Check tag matches project version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          V="${GITHUB_REF_NAME#v}"; V="${V%%-*}"
+          P=$(sed -nE 's/^project\(OpenGonio VERSION ([0-9.]+).*/\1/p' CMakeLists.txt)
+          echo "tag=$V cmake=$P"
+          [ "$V" = "$P" ] || { echo "::error::tag $GITHUB_REF_NAME does not match project(VERSION $P) in CMakeLists.txt"; exit 1; }
+
       - name: Configure
         shell: bash
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DOPENGONIO_COPY_PLUGIN=OFF ${{ matrix.cmake_extra }}
@@ -107,9 +116,37 @@ jobs:
       # ---- release packaging (tags only) ----
       - name: Package (macOS)
         if: runner.os == 'macOS' && startsWith(github.ref, 'refs/tags/v')
+        env:
+          APPLE_CERTS_P12_BASE64: ${{ secrets.APPLE_CERTS_P12_BASE64 }}
+          APPLE_CERTS_PASSWORD: ${{ secrets.APPLE_CERTS_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_API_KEY_P8_BASE64: ${{ secrets.APPLE_API_KEY_P8_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
         run: |
           V="${GITHUB_REF_NAME#v}"
-          packaging/macos/build-pkg.sh "$V" stage/OpenGonio.vst3 stage/OpenGonio.component dist
+          if [ -z "$APPLE_CERTS_P12_BASE64" ]; then
+            echo "::warning::No signing secrets; building an unsigned pkg."
+            packaging/macos/build-pkg.sh "$V" stage/OpenGonio.vst3 stage/OpenGonio.component dist
+            exit 0
+          fi
+          # Temporary keychain with the Developer ID Application + Installer identities.
+          KC="$RUNNER_TEMP/signing.keychain-db"; KCPW=$(uuidgen)
+          echo "$APPLE_CERTS_P12_BASE64" | base64 --decode > "$RUNNER_TEMP/certs.p12"
+          security create-keychain -p "$KCPW" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KCPW" "$KC"
+          security import "$RUNNER_TEMP/certs.p12" -P "$APPLE_CERTS_PASSWORD" -A -t cert -f pkcs12 -k "$KC"
+          security set-key-partition-list -S apple-tool:,apple:,codesign:,productsign: -s -k "$KCPW" "$KC" > /dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
+          security find-identity -v "$KC"
+          APP_ID="Developer ID Application: Brady Cole ($APPLE_TEAM_ID)"
+          PKG_ID="Developer ID Installer: Brady Cole ($APPLE_TEAM_ID)"
+          packaging/macos/build-pkg.sh "$V" stage/OpenGonio.vst3 stage/OpenGonio.component dist --sign-app "$APP_ID" --sign-pkg "$PKG_ID"
+          echo "$APPLE_API_KEY_P8_BASE64" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+          packaging/macos/notarize.sh "dist/OpenGonio-$V-macOS.pkg" "$RUNNER_TEMP/AuthKey.p8" "$APPLE_API_KEY_ID" "$APPLE_API_ISSUER_ID"
+          security delete-keychain "$KC"
+          rm -f "$RUNNER_TEMP/certs.p12" "$RUNNER_TEMP/AuthKey.p8"
 
       - name: Package (Windows)
         if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/v')
@@ -123,9 +160,12 @@ jobs:
           V="${GITHUB_REF_NAME#v}"
           ISCC="/c/Program Files (x86)/Inno Setup 6/ISCC.exe"
           [ -x "$ISCC" ] || choco install innosetup -y --no-progress
-          mkdir -p dist
-          "$ISCC" "/DVersion=$V" "/DVst3Dir=$(cygpath -w "$PWD/stage/OpenGonio.vst3")" "/DOutDir=$(cygpath -w "$PWD/dist")" "$(cygpath -w "$PWD/packaging/windows/opengonio.iss")"
-          (cd stage && 7z a "../dist/OpenGonio-$V-Windows-VST3.zip" OpenGonio.vst3)
+          mkdir -p dist docs-pkg
+          cp LICENSE docs-pkg/LICENSE.txt
+          bash packaging/macos/make-readme-txt.sh "$V" > docs-pkg/README.txt
+          cp docs-pkg/LICENSE.txt docs-pkg/README.txt stage/
+          "$ISCC" "/DVersion=$V" "/DVst3Dir=$(cygpath -w "$PWD/stage/OpenGonio.vst3")" "/DDocsDir=$(cygpath -w "$PWD/docs-pkg")" "/DOutDir=$(cygpath -w "$PWD/dist")" "$(cygpath -w "$PWD/packaging/windows/opengonio.iss")"
+          (cd stage && 7z a "../dist/OpenGonio-$V-Windows-VST3.zip" OpenGonio.vst3 LICENSE.txt README.txt)
 
       - name: Package (Linux)
         if: runner.os == 'Linux' && startsWith(github.ref, 'refs/tags/v')
@@ -133,6 +173,8 @@ jobs:
           V="${GITHUB_REF_NAME#v}"
           mkdir -p dist
           cp packaging/linux/install.sh stage/
+          cp LICENSE stage/LICENSE.txt
+          bash packaging/macos/make-readme-txt.sh "$V" > stage/README.txt
           tar -C stage -czf "dist/OpenGonio-$V-Linux.tar.gz" .
 
       - uses: actions/upload-artifact@v4

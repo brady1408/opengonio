@@ -35,8 +35,14 @@ RestartApplications=no
 UninstallDisplayName=OpenGonio {#Version}
 LicenseFile=..\..\LICENSE
 
+#ifndef DocsDir
+  #define DocsDir "."
+#endif
+
 [Files]
 Source: "{#Vst3Dir}\*"; DestDir: "{commoncf64}\VST3\OpenGonio.vst3"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#DocsDir}\LICENSE.txt"; DestDir: "{commoncf64}\VST3\OpenGonio.vst3"; Flags: ignoreversion
+Source: "{#DocsDir}\README.txt"; DestDir: "{commoncf64}\VST3\OpenGonio.vst3"; Flags: ignoreversion
 
 [Messages]
 FinishedLabel=OpenGonio is installed. Open your DAW (in Audacity: Effect > Plugin manager > Rescan plugins) and add OpenGonio as a realtime effect.
