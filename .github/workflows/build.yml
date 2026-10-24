@@ -1,0 +1,105 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+env:
+  PLUGINVAL_VERSION: v1.0.4
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-14
+            cmake_extra: -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+            pluginval_zip: pluginval_macOS.zip
+            pluginval_bin: pluginval.app/Contents/MacOS/pluginval
+          - name: Windows
+            os: windows-2022
+            cmake_extra: -G "Visual Studio 17 2022" -A x64
+            pluginval_zip: pluginval_Windows.zip
+            pluginval_bin: pluginval.exe
+          - name: Linux
+            os: ubuntu-22.04
+            cmake_extra: ""
+            pluginval_zip: pluginval_Linux.zip
+            pluginval_bin: pluginval
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libx11-dev libxrandr-dev libxinerama-dev \
+            libxcursor-dev libxi-dev libxext-dev libfreetype6-dev libfontconfig1-dev \
+            libgl1-mesa-dev libegl1-mesa-dev xvfb
+
+      - name: Cache fetched dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            build/_deps/juce-src
+            build/_deps/juce-subbuild
+            build/_deps/catch2-src
+            build/_deps/catch2-subbuild
+          key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt', 'tests/CMakeLists.txt') }}
+
+      - name: Configure
+        shell: bash
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DOPENGONIO_COPY_PLUGIN=OFF ${{ matrix.cmake_extra }}
+
+      - name: Build
+        run: cmake --build build --config Release -j 4
+
+      - name: Unit tests
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Download pluginval
+        shell: bash
+        run: |
+          curl -fsSL -o pv.zip "https://github.com/Tracktion/pluginval/releases/download/${PLUGINVAL_VERSION}/${{ matrix.pluginval_zip }}"
+          mkdir -p pv && cd pv && unzip -q ../pv.zip
+          chmod +x "${{ matrix.pluginval_bin }}" || true
+
+      - name: pluginval (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R build/OpenGonio_artefacts/Release/AU/OpenGonio.component ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar || true
+          pv/pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --validate-in-process --timeout-ms 120000 --validate build/OpenGonio_artefacts/Release/VST3/OpenGonio.vst3
+          pv/pluginval.app/Contents/MacOS/pluginval --strictness-level 5 --validate-in-process --timeout-ms 120000 --validate ~/Library/Audio/Plug-Ins/Components/OpenGonio.component
+
+      - name: pluginval (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: pv/pluginval.exe --strictness-level 5 --validate-in-process --timeout-ms 120000 --validate build/OpenGonio_artefacts/Release/VST3/OpenGonio.vst3
+
+      - name: pluginval (Linux)
+        if: runner.os == 'Linux'
+        run: xvfb-run -a pv/pluginval --strictness-level 5 --validate-in-process --skip-gui-tests --timeout-ms 120000 --validate build/OpenGonio_artefacts/Release/VST3/OpenGonio.vst3
+
+      - name: Stage artifacts
+        shell: bash
+        run: |
+          mkdir -p stage
+          cp -R build/OpenGonio_artefacts/Release/VST3/OpenGonio.vst3 stage/
+          if [ -d build/OpenGonio_artefacts/Release/AU/OpenGonio.component ]; then cp -R build/OpenGonio_artefacts/Release/AU/OpenGonio.component stage/; fi
+          if [ -d build/OpenGonio_artefacts/Release/LV2/OpenGonio.lv2 ]; then cp -R build/OpenGonio_artefacts/Release/LV2/OpenGonio.lv2 stage/; fi
+          ls -R stage | head -40
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OpenGonio-${{ matrix.name }}
+          path: stage/
+          if-no-files-found: error

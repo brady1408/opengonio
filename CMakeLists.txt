@@ -7,6 +7,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(OPENGONIO_BUILD_TESTS "Build the Catch2 unit tests" ON)
+option(OPENGONIO_COPY_PLUGIN "Copy built plugins into the user plugin folders" ON)
 
 include(FetchContent)
 FetchContent_Declare(JUCE
@@ -35,7 +36,7 @@ juce_add_plugin(OpenGonio
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
-    COPY_PLUGIN_AFTER_BUILD TRUE
+    COPY_PLUGIN_AFTER_BUILD ${OPENGONIO_COPY_PLUGIN}
     VST3_CATEGORIES Fx Analyzer
     AU_MAIN_TYPE kAudioUnitType_Effect
     LV2URI https://github.com/brady1408/opengonio)
