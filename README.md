@@ -6,7 +6,7 @@ Free, open-source goniometer, Lissajous / vectorscope and stereo field meter for
 [![build](https://github.com/brady1408/opengonio/actions/workflows/build.yml/badge.svg)](https://github.com/brady1408/opengonio/actions/workflows/build.yml)
 ![license](https://img.shields.io/badge/license-AGPL--3.0-blue)
 
-![OpenGonio in Audacity 4](docs/screenshots/editor-0.1.0.jpg)
+![OpenGonio 0.2.0 in Audacity 4](docs/screenshots/editor.jpg)
 
 One small window that answers the questions a stereo track raises: is it in phase, will it survive a mono fold-down, is one channel inverted or missing, and is it balanced. No account, no bundle, no newsletter, no telemetry. Install it, open your DAW, press play.
 
