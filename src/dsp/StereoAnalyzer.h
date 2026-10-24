@@ -9,6 +9,9 @@
 #include "PeakMeter.h"
 #include "StatusLight.h"
 
+#include <algorithm>
+#include <cmath>
+
 namespace opengonio::dsp
 {
 
@@ -34,6 +37,11 @@ public:
         peakL.prepare(sampleRate);
         peakR.prepare(sampleRate);
         light.prepare(sampleRate);
+        // Gate followers for the status light: fast enough that digital
+        // silence is seen within ~100 ms, slow enough that zero crossings of a
+        // low tone never read as silence. 700 dB/s.
+        gateRelease = std::pow(10.0, -kGateReleaseDbPerSecond / 20.0 / std::max(1.0, sampleRate));
+        gateL = gateR = 0.0;
     }
 
     void setMonoSource(bool mono) { monoSource = mono; }
@@ -46,7 +54,23 @@ public:
             energy.push(l[i], r[i]);
             peakL.push(l[i]);
             peakR.push(r[i]);
-            light.push(correlation.value(), peakL.levelDb(), peakR.levelDb());
+            gateL = std::max(absOrZero(l[i]), gateL * gateRelease);
+            gateR = std::max(absOrZero(r[i]), gateR * gateRelease);
+            light.push(correlation.value(), gateDb(gateL), gateDb(gateR));
+        }
+    }
+
+    // Transport stopped / no audio arriving: peak meters and the status gate
+    // see silence, while correlation, width and balance hold their last value.
+    void processSilence(int n)
+    {
+        for (int i = 0; i < n; ++i)
+        {
+            peakL.push(0.f);
+            peakR.push(0.f);
+            gateL *= gateRelease;
+            gateR *= gateRelease;
+            light.push(correlation.value(), gateDb(gateL), gateDb(gateR));
         }
     }
 
@@ -74,9 +98,19 @@ public:
         peakL.reset();
         peakR.reset();
         light.reset();
+        gateL = gateR = 0.0;
     }
 
 private:
+    static constexpr double kGateReleaseDbPerSecond = 700.0;
+
+    static double absOrZero(float x) { return std::isfinite(x) ? std::abs((double) x) : 0.0; }
+    // Unfloored dB for the silence gate; -200 stands in for -inf.
+    static float gateDb(double lin) { return lin > 0.0 ? (float) (20.0 * std::log10(lin)) : -200.f; }
+
+    double gateRelease = 1.0;
+    double gateL = 0.0, gateR = 0.0;
+
     CorrelationMeter correlation;
     EnergyTracker energy;
     PeakMeter peakL, peakR;

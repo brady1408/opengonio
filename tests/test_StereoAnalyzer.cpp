@@ -56,3 +56,53 @@ TEST_CASE("monoSource flag is echoed")
     a.setMonoSource(true);
     REQUIRE(a.readings().monoSource);
 }
+
+TEST_CASE("signal then one second of digital silence reads NoSignal")
+{
+    StereoAnalyzer a;
+    a.prepare(48000);
+    std::vector<float> l(48000), r(48000);
+    for (int i = 0; i < 48000; ++i)
+        l[i] = r[i] = 0.5f * (float) std::sin(2 * kPi * 440 * i / 48000.0);
+    a.process(l.data(), r.data(), 48000);
+    REQUIRE(a.readings().status == Status::Ok);
+    std::vector<float> z(48000, 0.f);
+    a.process(z.data(), z.data(), 48000);
+    REQUIRE(a.readings().status == Status::NoSignal);
+}
+
+TEST_CASE("left-only signal through the analyzer reads LeftOnly")
+{
+    StereoAnalyzer a;
+    a.prepare(48000);
+    std::vector<float> l(48000), z(48000, 0.f);
+    for (int i = 0; i < 48000; ++i)
+        l[i] = 0.5f * (float) std::sin(2 * kPi * 440 * i / 48000.0);
+    a.process(l.data(), z.data(), 48000);
+    REQUIRE(a.readings().status == Status::LeftOnly);
+    a.process(z.data(), l.data(), 48000);
+    REQUIRE(a.readings().status == Status::RightOnly);
+}
+
+TEST_CASE("processSilence lets meters fall and status go NoSignal while readouts hold")
+{
+    StereoAnalyzer a;
+    a.prepare(48000);
+    std::vector<float> l(48000), r(48000);
+    for (int i = 0; i < 48000; ++i)
+    {
+        l[i] = 0.5f * (float) std::sin(2 * kPi * 440 * i / 48000.0);
+        r[i] = 0.8f * l[i];
+    }
+    a.process(l.data(), r.data(), 48000);
+    const auto before = a.readings();
+    REQUIRE(before.status == Status::Ok);
+
+    a.processSilence(48000);
+    const auto after = a.readings();
+    REQUIRE(after.status == Status::NoSignal);
+    REQUIRE(after.levelDbL < before.levelDbL - 15.f);
+    REQUIRE(after.correlation == Approx(before.correlation).margin(0.001));
+    REQUIRE(after.widthPercent == Approx(before.widthPercent).margin(0.01));
+    REQUIRE(after.balanceDb == Approx(before.balanceDb).margin(0.01));
+}

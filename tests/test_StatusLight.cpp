@@ -48,3 +48,15 @@ TEST_CASE("a 100 ms blip does not flip the state")
         s.push(-0.9f, -6.f, -6.f);
     REQUIRE(s.status() == Status::Ok);
 }
+
+TEST_CASE("one silent channel reads LeftOnly or RightOnly, not Caution")
+{
+    StatusLight s;
+    s.prepare(48000);
+    for (int i = 0; i < 48000; ++i)
+        s.push(0.f, -6.f, -80.f);
+    REQUIRE(s.status() == Status::LeftOnly);
+    for (int i = 0; i < 48000; ++i)
+        s.push(0.f, -80.f, -6.f);
+    REQUIRE(s.status() == Status::RightOnly);
+}

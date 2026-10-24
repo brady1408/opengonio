@@ -7,10 +7,12 @@
 namespace opengonio::ui
 {
 
-// MONO OK / CAUTION / PHASE ISSUE / NO SIGNAL, or MONO SOURCE when the input is mono.
+// MONO OK / CAUTION / PHASE ISSUE / NO SIGNAL / L ONLY / R ONLY, or MONO SOURCE when the input is mono.
 class StatusPill : public juce::Component
 {
 public:
+    StatusPill() = default;
+
     void setStatus(opengonio::dsp::Status status, bool monoSource);
     void paint(juce::Graphics&) override;
 

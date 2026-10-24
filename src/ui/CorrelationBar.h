@@ -9,6 +9,8 @@ namespace opengonio::ui
 class CorrelationBar : public juce::Component
 {
 public:
+    CorrelationBar() = default;
+
     void setValue(float correlation);
     void paint(juce::Graphics&) override;
 

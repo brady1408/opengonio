@@ -50,6 +50,18 @@ void StatusPill::paint(juce::Graphics& g)
             border = theme::issueBorder;
             fg = theme::red;
             break;
+        case Status::LeftOnly:
+            text = "L ONLY";
+            bg = theme::panelBg;
+            border = theme::amber;
+            fg = theme::amber;
+            break;
+        case Status::RightOnly:
+            text = "R ONLY";
+            bg = theme::panelBg;
+            border = theme::amber;
+            fg = theme::amber;
+            break;
         case Status::NoSignal:
         default:
             text = "NO SIGNAL";

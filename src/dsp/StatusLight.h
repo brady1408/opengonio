@@ -1,6 +1,6 @@
 #pragma once
 
-// MONO OK / CAUTION / PHASE ISSUE / NO SIGNAL state machine with hysteresis:
+// MONO OK / CAUTION / PHASE ISSUE / NO SIGNAL / L ONLY / R ONLY state machine with hysteresis:
 // the displayed status changes only after the candidate state has been stable
 // for `holdMs` (500 ms by default). Plain C++ only.
 
@@ -14,7 +14,9 @@ enum class Status
     NoSignal,
     Ok,
     Caution,
-    Issue
+    Issue,
+    LeftOnly,  // right channel silent, left has signal
+    RightOnly  // left channel silent, right has signal
 };
 
 class StatusLight
@@ -58,8 +60,13 @@ private:
 
     static Status classify(float c, float dbL, float dbR)
     {
-        if (dbL < kSilenceDb && dbR < kSilenceDb)
+        const bool silentL = dbL < kSilenceDb, silentR = dbR < kSilenceDb;
+        if (silentL && silentR)
             return Status::NoSignal;
+        if (silentR)
+            return Status::LeftOnly;
+        if (silentL)
+            return Status::RightOnly;
         if (c > kOkAbove)
             return Status::Ok;
         if (c < kIssueBelow)
