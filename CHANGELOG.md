@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 — 2026-10-24
+
+- **macOS builds are now signed and notarized.** The pkg installs with no Gatekeeper prompt; the bundles carry a Developer ID signature with hardened runtime.
+- Every package (macOS pkg, Windows installer and zip, Linux tarball) now carries LICENSE.txt and README.txt.
+- CI refuses a release tag that does not match the project version.
+- Windows builds remain unsigned (SmartScreen "Run anyway"). Linux builds remain untested by the author.
+
 ## 0.1.1 — 2026-10-24
 
 Fixes from the post-release code review. Use this instead of 0.1.0.

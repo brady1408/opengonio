@@ -18,23 +18,13 @@ Download the file for your system from the [latest release](https://github.com/b
 
 Run `OpenGonio-<version>-macOS.pkg`. It installs `OpenGonio.vst3` and `OpenGonio.component` into `/Library/Audio/Plug-Ins`. Quit Audacity first when upgrading.
 
-**This 0.1.0 build is not yet notarized.** macOS may say the installer "cannot be opened because it is from an unidentified developer", or Audacity may report the plugin as damaged or blocked. Either:
-
-- Right-click the `.pkg` and choose **Open**, then **Open** again in the dialog; or
-- Open **System Settings → Privacy & Security**, scroll down, and click **Open Anyway** next to the OpenGonio message; or
-- In Terminal, clear the quarantine flag after installing:
-
-```bash
-xattr -dr com.apple.quarantine /Library/Audio/Plug-Ins/VST3/OpenGonio.vst3 /Library/Audio/Plug-Ins/Components/OpenGonio.component
-```
-
-Signing and notarization are planned for 0.2.0.
+Since 0.2.0 the package is signed with a Developer ID and notarized by Apple, so it opens without security prompts. If you are on 0.1.x, upgrade; those builds were unsigned.
 
 ### Windows (VST3, 64-bit, Windows 10+)
 
 Run `OpenGonio-<version>-Windows-Setup.exe`. It installs `OpenGonio.vst3` into `C:\Program Files\Common Files\VST3`. Close Audacity (or any DAW with OpenGonio loaded) first when upgrading, since a loaded plugin file cannot be replaced.
 
-**SmartScreen may show "Windows protected your PC".** Click **More info → Run anyway**. The build is not code-signed yet.
+**SmartScreen may show "Windows protected your PC".** Click **More info → Run anyway**. Windows builds are not code-signed yet.
 
 Prefer no installer? `OpenGonio-<version>-Windows-VST3.zip` holds the bare `OpenGonio.vst3` folder; copy it into `C:\Program Files\Common Files\VST3`.
 
