@@ -54,9 +54,15 @@ public:
     }
 
 private:
+#ifndef OPENGONIO_OK_ABOVE
+#define OPENGONIO_OK_ABOVE 0.1f
+#endif
+#ifndef OPENGONIO_ISSUE_BELOW
+#define OPENGONIO_ISSUE_BELOW -0.2f
+#endif
     static constexpr float kSilenceDb = -70.f;
-    static constexpr float kOkAbove = 0.3f;
-    static constexpr float kIssueBelow = -0.3f;
+    static constexpr float kOkAbove = OPENGONIO_OK_ABOVE;
+    static constexpr float kIssueBelow = OPENGONIO_ISSUE_BELOW;
 
     static Status classify(float c, float dbL, float dbR)
     {

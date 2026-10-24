@@ -13,10 +13,12 @@ option(OPENGONIO_COPY_PLUGIN "Copy built plugins into the user plugin folders" O
 # alternate build sets OPENGONIO_VARIANT=B to get a separately named plugin
 # ("OpenGonio B", plugin code OgoB) that can sit beside the default in a host.
 set(OPENGONIO_VARIANT "" CACHE STRING "Variant suffix for side-by-side A/B builds (empty or B)")
-set(OPENGONIO_DECAY_ALPHA "0.18f" CACHE STRING "Scope persistence decay per frame")
-set(OPENGONIO_HOT_POINTS "64" CACHE STRING "Trailing points drawn in the hot colour")
+set(OPENGONIO_DECAY_ALPHA "0.24f" CACHE STRING "Scope persistence decay per frame")
+set(OPENGONIO_HOT_POINTS "160" CACHE STRING "Trailing points drawn in the hot colour")
 set(OPENGONIO_LINE_WIDTH "1.0f" CACHE STRING "Scope trace line width in px")
-set(OPENGONIO_AUTOGAIN_RELEASE "0.5f" CACHE STRING "Auto-gain release in seconds")
+set(OPENGONIO_AUTOGAIN_RELEASE "1.0f" CACHE STRING "Auto-gain release in seconds")
+set(OPENGONIO_OK_ABOVE "0.1f" CACHE STRING "Correlation above which the light reads MONO OK")
+set(OPENGONIO_ISSUE_BELOW "-0.2f" CACHE STRING "Correlation below which the light reads PHASE ISSUE")
 
 if(OPENGONIO_VARIANT STREQUAL "")
     set(OPENGONIO_PRODUCT_NAME "OpenGonio")
@@ -76,6 +78,8 @@ target_compile_definitions(OpenGonio PUBLIC
     OPENGONIO_HOT_POINTS=${OPENGONIO_HOT_POINTS}
     OPENGONIO_LINE_WIDTH=${OPENGONIO_LINE_WIDTH}
     OPENGONIO_AUTOGAIN_RELEASE=${OPENGONIO_AUTOGAIN_RELEASE}
+    OPENGONIO_OK_ABOVE=${OPENGONIO_OK_ABOVE}
+    OPENGONIO_ISSUE_BELOW=${OPENGONIO_ISSUE_BELOW}
     JUCE_WEB_BROWSER=0
     JUCE_USE_CURL=0
     JUCE_VST3_CAN_REPLACE_VST2=0)

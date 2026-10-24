@@ -58,7 +58,7 @@ Tested with Audacity 4.0.1. Any VST3, AU or LV2 host should work the same way.
 ## What the display means
 
 - **Goniometer.** Left and right plotted against each other, rotated 45°. A mono signal draws a vertical line, a wide stereo image a round cloud, an inverted channel a horizontal line, and a single channel a diagonal leaning toward L or R. ±1 spans the box at the fixed scale; click **AUTO** in the scope's corner to normalize quiet material.
-- **Status light.** `MONO OK` (correlation above +0.3), `CAUTION` (between −0.3 and +0.3), `PHASE ISSUE` (below −0.3), `NO SIGNAL`, and `L ONLY` / `R ONLY` when one channel is silent. Each state must hold for half a second before the light changes, so it does not flicker.
+- **Status light.** `MONO OK` (correlation above +0.1), `CAUTION` (between −0.2 and +0.1), `PHASE ISSUE` (below −0.2), `NO SIGNAL`, and `L ONLY` / `R ONLY` when one channel is silent. Each state must hold for half a second before the light changes, so it does not flicker. These thresholds are a starting point; if your experience says they should sit elsewhere, [open an issue](https://github.com/brady1408/opengonio/issues).
 - **L / R meters.** Sample-peak level in dBFS with a 1.5 s peak-hold tick; the bar end turns red for 2 s after a sample above −0.1 dBFS.
 - **Correlation.** Phase correlation over a 300 ms window: +1 identical, 0 unrelated, −1 inverted. The bar below repeats it on a −1 to +1 scale.
 - **Width.** 0 % for mono, about 100 % for a fully uncorrelated image, up to 200 % for out-of-phase material.

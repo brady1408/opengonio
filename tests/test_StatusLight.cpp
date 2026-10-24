@@ -14,7 +14,7 @@ TEST_CASE("starts NoSignal; silence stays NoSignal")
     REQUIRE(s.status() == Status::NoSignal);
 }
 
-TEST_CASE("Ok after 500 ms of correlation above 0.3, not before")
+TEST_CASE("Ok after 500 ms of correlation above the OK threshold, not before")
 {
     StatusLight s;
     s.prepare(48000);
@@ -26,7 +26,7 @@ TEST_CASE("Ok after 500 ms of correlation above 0.3, not before")
     REQUIRE(s.status() == Status::Ok);
 }
 
-TEST_CASE("Issue below -0.3, Caution between")
+TEST_CASE("Issue below the issue threshold, Caution between")
 {
     StatusLight s;
     s.prepare(48000);
