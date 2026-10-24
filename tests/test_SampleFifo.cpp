@@ -45,3 +45,22 @@ TEST_CASE("clearFromConsumer empties the ring")
     f.clearFromConsumer();
     REQUIRE(f.size() == 0);
 }
+
+TEST_CASE("fifo wraps around the ring correctly")
+{
+    SampleFifo f(8);
+    float in[6] = {1, 2, 3, 4, 5, 6}, out[8], outr[8];
+    REQUIRE(f.push(in, in, 6) == 6);
+    REQUIRE(f.pop(out, outr, 6) == 6);
+    float in2[6] = {7, 8, 9, 10, 11, 12};
+    REQUIRE(f.push(in2, in2, 6) == 6); // crosses the end of the ring
+    REQUIRE(f.pop(out, outr, 6) == 6);
+    REQUIRE(out[0] == 7.f);
+    REQUIRE(out[5] == 12.f);
+}
+
+TEST_CASE("the processor's fixed FIFO capacity covers more than a second at 192 kHz")
+{
+    REQUIRE(opengonio::dsp::kProcessorFifoFrames >= 192000 * 1.3);
+    REQUIRE(SampleFifo(opengonio::dsp::kProcessorFifoFrames).capacity() == opengonio::dsp::kProcessorFifoFrames);
+}

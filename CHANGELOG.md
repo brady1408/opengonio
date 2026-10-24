@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.1 — 2026-10-24
+
+Fixes from the post-release code review. Use this instead of 0.1.0.
+
+- **Crash fix:** at sample rates of 88.2 kHz and above the processor re-created its sample ring while the editor could still be reading it. The ring is now allocated once at a fixed size.
+- Status light no longer freezes in hosts that deliver large audio blocks (2048–4096 samples): idle silence is only injected after ~100 ms without audio.
+- Balance reads `L 60.0 dB` / `R 60.0 dB` instead of `C` when one channel is digital silence.
+- The AUTO gain toggle in the scope's corner is now visible when off (dimmed), not only when on.
+- The correlation readout colours now match the status-light thresholds (+0.1 / −0.2).
+- Windows installer asks you to close a DAW that has OpenGonio loaded instead of failing to replace the file.
+- Seven more unit tests (37 total).
+
 ## 0.1.0 — 2026-10-24
 
 First release.

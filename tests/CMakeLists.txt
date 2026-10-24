@@ -11,7 +11,8 @@ add_executable(opengonio_tests
     test_EnergyTracker.cpp
     test_PeakMeter.cpp
     test_StatusLight.cpp
-    test_StereoAnalyzer.cpp)
+    test_StereoAnalyzer.cpp
+    test_IdleDetector.cpp)
 
 target_include_directories(opengonio_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(opengonio_tests PRIVATE Catch2::Catch2WithMain)

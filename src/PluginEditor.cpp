@@ -136,10 +136,15 @@ void OpenGonioEditor::drainAudio()
     if (proc.fifo().size() > kMaxFramesPerTick)
         proc.fifo().clearFromConsumer();
 
-    // Nothing arrived this tick: the transport is stopped (or the host is not
-    // calling us). Let the meters fall and the status light go quiet.
-    if (drained == 0 && analyzerRate > 0.0)
-        analyzer.processSilence((int) (analyzerRate / 60.0));
+    // Nothing arrived for a while: the transport is stopped (or the host is not
+    // calling us). Let the meters fall and the status light go quiet. A few
+    // empty ticks are normal with large host blocks, so IdleDetector waits.
+    if (analyzerRate > 0.0)
+    {
+        const int silence = idle.onTick(drained, (int) (analyzerRate / 60.0));
+        if (silence > 0)
+            analyzer.processSilence(silence);
+    }
 }
 
 void OpenGonioEditor::pushReadings()
@@ -151,9 +156,10 @@ void OpenGonioEditor::pushReadings()
     meterR.setLevels(r.levelDbR, r.holdDbR, r.clipR);
 
     correlationPill.setValue(juce::String::formatted("%+.2f", (double) r.correlation));
-    correlationPill.setValueColour(r.correlation < -0.3f ? theme::red
-                                   : std::abs(r.correlation) <= 0.3f ? theme::amber
-                                                                     : theme::textPrimary);
+    using opengonio::dsp::StatusLight;
+    correlationPill.setValueColour(r.correlation < StatusLight::kIssueBelow ? theme::red
+                                   : r.correlation <= StatusLight::kOkAbove ? theme::amber
+                                                                            : theme::textPrimary);
     widthPill.setValue(juce::String::formatted("%.0f%%", (double) r.widthPercent));
     balancePill.setValue(dsp::formatBalance(r.balanceDb));
     correlationBar.setValue(r.correlation);

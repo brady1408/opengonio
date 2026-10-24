@@ -56,11 +56,17 @@ inline float widthPercent(float rmsM, float rmsS)
     return 100.f * 2.f * rmsS / sum;
 }
 
-// Positive = left louder. Clamped to [-60, 60]; 0 when either side is silent.
+// Positive = left louder. Clamped to [-60, 60]. 0 when both sides are silent;
+// full clamp toward the live side when only one is.
 inline float balanceDb(float rmsL, float rmsR)
 {
-    if (rmsL < 1e-9f || rmsR < 1e-9f)
+    const bool silentL = rmsL < 1e-9f, silentR = rmsR < 1e-9f;
+    if (silentL && silentR)
         return 0.f;
+    if (silentR)
+        return 60.f;
+    if (silentL)
+        return -60.f;
     const float db = 20.f * std::log10(rmsL / rmsR);
     return db < -60.f ? -60.f : (db > 60.f ? 60.f : db);
 }

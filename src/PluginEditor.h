@@ -1,6 +1,7 @@
 #pragma once
 
 #include "PluginProcessor.h"
+#include "dsp/IdleDetector.h"
 #include "dsp/StereoAnalyzer.h"
 #include "ui/CorrelationBar.h"
 #include "ui/LevelMeter.h"
@@ -29,6 +30,7 @@ private:
 
     OpenGonioProcessor& proc;
     opengonio::dsp::StereoAnalyzer analyzer;
+    opengonio::dsp::IdleDetector idle;
     double analyzerRate = 0.0;
 
     opengonio::ui::ScopeComponent scope;

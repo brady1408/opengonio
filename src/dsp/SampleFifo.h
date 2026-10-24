@@ -13,6 +13,12 @@
 namespace opengonio::dsp
 {
 
+// Capacity the processor allocates once, at construction. 262144 frames is
+// ~1.37 s at 192 kHz and 2 MB of floats; the editor drains at most 32768 per
+// tick, so this never needs to grow, and never growing is what keeps the
+// editor's reference to the ring valid for the processor's whole life.
+inline constexpr int kProcessorFifoFrames = 262144;
+
 class SampleFifo
 {
 public:

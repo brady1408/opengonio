@@ -127,8 +127,9 @@ void ScopeComponent::paint(juce::Graphics& g)
     g.drawText("L", b.withWidth(14).translated(pad, 0), juce::Justification::centred);
     g.drawText("R", b.withLeft(b.getRight() - 14).translated(-pad, 0), juce::Justification::centred);
 
-    if (autoGainEnabled)
-        g.drawText("AUTO", autoTagBounds(), juce::Justification::centredRight);
+    // The AUTO toggle is always visible: dim when off, bright when on.
+    g.setColour(autoGainEnabled ? theme::greenHot : theme::textMuted.withAlpha(0.45f));
+    g.drawText("AUTO", autoTagBounds(), juce::Justification::centredRight);
 }
 
 void ScopeComponent::mouseUp(const juce::MouseEvent& e)

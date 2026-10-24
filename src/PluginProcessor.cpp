@@ -3,7 +3,6 @@
 
 namespace
 {
-constexpr int kInitialFifoFrames = 96000;
 constexpr const char* kEditorW = "editorW";
 constexpr const char* kEditorH = "editorH";
 } // namespace
@@ -13,7 +12,7 @@ OpenGonioProcessor::OpenGonioProcessor()
                          .withInput("Input", juce::AudioChannelSet::stereo(), true)
                          .withOutput("Output", juce::AudioChannelSet::stereo(), true)),
       apvts(*this, nullptr, "OpenGonio", createLayout()),
-      sampleFifo(std::make_unique<opengonio::dsp::SampleFifo>(kInitialFifoFrames))
+      sampleFifo(std::make_unique<opengonio::dsp::SampleFifo>(opengonio::dsp::kProcessorFifoFrames))
 {
 }
 
@@ -29,12 +28,8 @@ void OpenGonioProcessor::prepareToPlay(double newSampleRate, int)
 {
     sampleRate.store(newSampleRate);
     setLatencySamples(0);
-
-    // Two seconds of audio. Only re-create the ring when the capacity changes,
-    // and never from processBlock.
-    const int wanted = (int) (2.0 * newSampleRate);
-    if (sampleFifo->capacity() < wanted)
-        sampleFifo = std::make_unique<opengonio::dsp::SampleFifo>(wanted);
+    // The ring is allocated once in the constructor (kProcessorFifoFrames) and
+    // never replaced: the editor holds a reference to it from another thread.
 }
 
 bool OpenGonioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const

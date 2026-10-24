@@ -27,6 +27,11 @@ SolidCompression=yes
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
+; A DAW that has OpenGonio loaded keeps the .vst3 locked; ask the user to close it
+; instead of failing the file replace.
+CloseApplications=yes
+CloseApplicationsFilter=*.vst3
+RestartApplications=no
 UninstallDisplayName=OpenGonio {#Version}
 LicenseFile=..\..\LICENSE
 

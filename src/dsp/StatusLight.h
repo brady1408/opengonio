@@ -53,7 +53,6 @@ public:
         pendingCount = 0;
     }
 
-private:
 #ifndef OPENGONIO_OK_ABOVE
 #define OPENGONIO_OK_ABOVE 0.1f
 #endif
@@ -64,6 +63,7 @@ private:
     static constexpr float kOkAbove = OPENGONIO_OK_ABOVE;
     static constexpr float kIssueBelow = OPENGONIO_ISSUE_BELOW;
 
+private:
     static Status classify(float c, float dbL, float dbR)
     {
         const bool silentL = dbL < kSilenceDb, silentR = dbR < kSilenceDb;

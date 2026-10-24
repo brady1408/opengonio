@@ -106,3 +106,22 @@ TEST_CASE("processSilence lets meters fall and status go NoSignal while readouts
     REQUIRE(after.widthPercent == Approx(before.widthPercent).margin(0.01));
     REQUIRE(after.balanceDb == Approx(before.balanceDb).margin(0.01));
 }
+
+TEST_CASE("NaN frames through the analyzer leave every reading finite")
+{
+    StereoAnalyzer a;
+    a.prepare(48000);
+    std::vector<float> l(4800), r(4800);
+    for (int i = 0; i < 4800; ++i)
+    {
+        l[i] = (i % 97 == 0) ? NAN : 0.5f * (float) std::sin(2 * kPi * 440 * i / 48000.0);
+        r[i] = l[i];
+    }
+    a.process(l.data(), r.data(), 4800);
+    const auto R = a.readings();
+    REQUIRE(std::isfinite(R.correlation));
+    REQUIRE(std::isfinite(R.widthPercent));
+    REQUIRE(std::isfinite(R.balanceDb));
+    REQUIRE(std::isfinite(R.levelDbL));
+    REQUIRE(std::isfinite(R.holdDbR));
+}

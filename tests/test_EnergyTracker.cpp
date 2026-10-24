@@ -69,3 +69,11 @@ TEST_CASE("formatBalance edges")
     REQUIRE(formatBalance(0.11f) == "L 0.1 dB");
     REQUIRE(formatBalance(-1.24f) == "R 1.2 dB");
 }
+
+TEST_CASE("balance reads the live side at full clamp when the other channel is silent")
+{
+    REQUIRE(balanceDb(0.5f, 0.f) == Approx(60.f));
+    REQUIRE(balanceDb(0.f, 0.5f) == Approx(-60.f));
+    REQUIRE(balanceDb(0.f, 0.f) == 0.f);
+    REQUIRE(formatBalance(balanceDb(0.5f, 0.f)) == "L 60.0 dB");
+}
