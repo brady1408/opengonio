@@ -6,7 +6,8 @@ FetchContent_Declare(Catch2
 FetchContent_MakeAvailable(Catch2)
 
 add_executable(opengonio_tests
-    test_SampleFifo.cpp)
+    test_SampleFifo.cpp
+    test_CorrelationMeter.cpp)
 
 target_include_directories(opengonio_tests PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(opengonio_tests PRIVATE Catch2::Catch2WithMain)
